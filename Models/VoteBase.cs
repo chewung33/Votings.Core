@@ -14,7 +14,7 @@ public abstract class VoteBase
     public abstract string Question { get; }
 
     /// <summary>
-    /// In seconds. If -1 in override class, then control by yourself.
+    /// In seconds. If -1 in override class, then control by yourself. If you trying use VoteManager, then it`s set -1 to 30.
     /// </summary>
     public virtual short Duration { get; } = -1;
 
@@ -35,21 +35,36 @@ public abstract class VoteBase
         return true;
     }
 
-    public void Start()
+    public bool Start()
     {
+        if (_isLocked) return false;
+
         _isStarted = true;
         OnVotingStarted();
+        return true;
     }
 
-    public void Complete()
+    public bool Complete()
     {
-        if (_isLocked) return;
+        if (_isLocked) return false;
 
         _isLocked = true;
         VoteResult = GetResult();
 
         OnVotingEnded();
         OnCompleted();
+        return true;
+    }
+
+    public void Refresh()
+    {
+        _voters.Clear();
+
+        _isStarted = false;
+        _isLocked = false;
+        VoteResult = null;
+        VotedYes = 0;
+        VotedNo = 0;
     }
 
     protected virtual void OnVotingStarted() { }

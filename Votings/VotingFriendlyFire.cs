@@ -5,11 +5,17 @@ namespace Voting.Core.Votings;
 
 internal sealed class VotingFriendlyFire : VoteAction
 {
+    private bool _previousStateFriendlyFire;
+
     public override string Name { get; } = "Friendly Fire";
     public override string Question => Plugin.Instance?.Config.Translation.VotingFF.Question;
     public override short Duration { get; } = 30;
 
-    protected override void OnVotingStarted() => Round.IsLocked = true;
+    protected override void OnVotingStarted()
+    {
+        _previousStateFriendlyFire = Server.FriendlyFire;
+        Round.IsLocked = true;
+    }
     protected override void OnVotingEnded()
     {
         Round.IsLocked = false;
@@ -31,6 +37,16 @@ internal sealed class VotingFriendlyFire : VoteAction
 
     protected override void OnVotePassed()
     {
-        Server.FriendlyFire = this.VoteResult!.Result == Enums.VoteOutcome.Passed;
+        Server.FriendlyFire = true;
+    }
+
+    protected override void OnVoteDraw()
+    {
+        Server.FriendlyFire = _previousStateFriendlyFire;
+    }
+
+    protected override void OnVoteFailed()
+    {
+        Server.FriendlyFire = false;
     }
 }

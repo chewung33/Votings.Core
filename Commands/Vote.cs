@@ -1,4 +1,5 @@
 ﻿using CommandSystem;
+using LabApi.Features.Console;
 using LabApi.Features.Wrappers;
 using System;
 using Voting.Core.Features;
@@ -37,7 +38,7 @@ internal sealed class Vote : ICommand
                 return false;
         }
 
-        if (!VoteManager.TryVote(0, pl.UserId, isYes))
+        if (VoteManager.CurrentVote is null || !VoteManager.CurrentVote.Vote(pl.UserId, isYes))
         {
             response = Plugin.Instance.Config.Translation.VoteError;
             return false;

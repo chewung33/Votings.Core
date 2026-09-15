@@ -8,11 +8,14 @@ namespace Voting.Core;
 
 public class Plugin : Plugin<Config>
 {
-    private HashSet<CustomEventsHandler> _handlers;
+    private static readonly HashSet<CustomEventsHandler> _handlers = [
+        new ServerHandler()
+    ];
 
     public override string Name { get; } = "Voting.Core";
     public override string Author => "IOT_TOI";
     public override string Description => string.Empty;
+    public override Version Version { get; } = new(0, 1, 1);
     public override Version RequiredApiVersion => LabApi.Features.LabApiProperties.CurrentVersion;
 
     public static Plugin Instance { get; private set; }
@@ -29,15 +32,7 @@ public class Plugin : Plugin<Config>
         Instance = null;
     }
 
-    private void RegisterHandlers()
-    {
-        _handlers = [
-            new ServerHandler()
-        ];
-
-        ProcessHandlers(CustomHandlersManager.RegisterEventsHandler);
-    }
-
+    private void RegisterHandlers() => ProcessHandlers(CustomHandlersManager.RegisterEventsHandler);
     private void UnregisterHandlers() => ProcessHandlers(CustomHandlersManager.UnregisterEventsHandler);
     private void ProcessHandlers(Action<CustomEventsHandler> action)
     {
